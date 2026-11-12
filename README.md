@@ -1,37 +1,37 @@
-# Commander ⚡
+# Commander
 
-Commander is an AI-powered prompt copilot that turns partial prompts into useful, ready-to-use suggestions.
+**A lightweight Node.js service that turns partial prompts into ranked, diverse suggestions.**
 
-It is designed for an **inline/autocomplete UX**, not a normal chatbot. Instead of asking one model to finish text, Commander orchestrates several focused agents that can **finish, expand, clarify, critique, format, split, and strengthen** a prompt.
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-## Core idea
+Commander is a prompt-improvement API, not a chat interface. It runs a set of focused agents in parallel to complete, expand, clarify, critique, format, or break a partial prompt into steps.
 
-```text
-User types a partial prompt
-        ↓
-   Commander API
-        ↓
- ┌──────┼──────────────────────────┐
- ↓      ↓       ↓       ↓          ↓
-Finish Expand Clarify Critic   Formatter...
- └──────┴──────────────────────────┘
-        ↓
- Deduplicate + score + diversify
-        ↓
-  Top suggestions → editor
+## Current Features
+
+- Seven specialist prompt agents.
+- Parallel calls through the OpenAI Responses API.
+- JSON-structured agent outputs.
+- Deduplication, novelty scoring, and type-aware ranking.
+- Short-lived in-memory response cache.
+- Mock mode when `OPENAI_API_KEY` is not configured.
+
+## Quick Start
+
+Node.js 20 or later is required.
+
+```bash
+git clone https://github.com/Gitcoder12/Commander.git
+cd Commander
+cp .env.example .env
 ```
 
-## Agent roles
+Edit `.env` and add an API key to enable live model requests. Without a key, Commander returns deterministic mock suggestions.
 
-| Agent | Purpose |
-|---|---|
-| `finisher` | Completes the prompt without changing its intent |
-| `expander` | Adds useful context, constraints, and expected output |
-| `clarifier` | Finds the most valuable missing constraint |
-| `critic` | Finds ambiguity or a weak assumption |
-| `formatter` | Suggests a useful output structure |
-| `stepper` | Converts a task into 3–5 actionable steps |
-| `persona` | Adds an expert role when it materially helps |
+```bash
+npm start
+```
+
+The API listens on `http://localhost:3000`.
 
 ## API
 
@@ -42,13 +42,12 @@ Request:
 ```json
 {
   "promptPartial": "build me a website for",
-  "cursorIndex": 27,
   "context": "The user is building a portfolio site",
   "max_suggestions": 5
 }
 ```
 
-Response:
+Response shape:
 
 ```json
 {
@@ -61,47 +60,12 @@ Response:
       "agent": "finisher"
     }
   ],
-  "model": "gpt-5.6-luna",
+  "model": "gpt-6-luna",
   "cached": false
 }
 ```
 
-## UX target
-
-Commander should eventually support:
-
-- **Ghost completion:** highest-confidence completion appears inline; `Tab` accepts it.
-- **Suggestion palette:** `↑ ↓ Enter` navigates 3–6 alternatives.
-- **Combine:** accept useful pieces from different agents.
-- **Preview:** inspect the complete prompt before inserting it.
-- **Keyboard-first:** the user should rarely need to leave the editor.
-
-## MVP architecture
-
-The current MVP is intentionally small:
-
-- Node.js HTTP server
-- Parallel specialist agents
-- OpenAI Responses API adapter
-- Strict JSON output from agents
-- Deduplication
-- Novelty scoring
-- Type diversity in the final ranking
-- Short-lived in-memory cache
-- Mock mode when `OPENAI_API_KEY` is not configured
-
-No frontend framework or dependency is required yet. This keeps the core orchestration easy to test and replace.
-
-## Run locally
-
-```bash
-cp .env.example .env
-npm start
-```
-
-Without an API key, Commander runs in mock mode.
-
-Test the endpoint:
+Try it locally:
 
 ```bash
 curl -X POST http://localhost:3000/api/suggest \
@@ -109,46 +73,44 @@ curl -X POST http://localhost:3000/api/suggest \
   -d '{"promptPartial":"build me a portfolio website","max_suggestions":5}'
 ```
 
-## Roadmap
+## Configuration
 
-### Phase 1 — Core engine
+| Variable | Purpose |
+|---|---|
+| `PORT` | HTTP server port (default: `3000`) |
+| `OPENAI_API_KEY` | Enables live model calls; omit to use mock mode |
+| `COMMANDER_MODEL` | OpenAI model ID (default: `gpt-6-luna`) |
+| `MAX_SUGGESTIONS` | Default maximum number of returned suggestions |
+| `CACHE_TTL_MS` | In-memory cache lifetime in milliseconds |
 
-- [x] Agent definitions
-- [x] Parallel orchestration
-- [x] JSON parsing
-- [x] Ranking and deduplication
-- [x] Mock mode
-- [x] API endpoint
+Use a model ID available to your OpenAI API project and override `COMMANDER_MODEL` as needed.
 
-### Phase 2 — Editor UX
+## Run Tests
 
-- [ ] Inline ghost completion
-- [ ] Suggestion palette
-- [ ] Keyboard controls
-- [ ] Accept/replace/append actions
-- [ ] Combine suggestions
+```bash
+npm test
+```
 
-### Phase 3 — Production intelligence
+The tests cover suggestion deduplication, score ordering, and type diversity.
 
-- [ ] Streaming suggestions
-- [ ] Better semantic similarity
-- [ ] User-specific preferences
-- [ ] Model routing by task complexity
-- [ ] Cost and latency telemetry
-- [ ] Persistent cache
-- [ ] Abuse/rate limiting
+## Project Structure
 
-### Phase 4 — Commander becomes a prompt operating layer
+```text
+Commander/
+├── src/
+│   ├── server.js  # HTTP endpoint and model orchestration
+│   ├── agents.js  # Specialist agent instructions
+│   └── ranker.js  # Deduplication, novelty, and ranking
+├── tests/
+│   └── ranker.test.js
+├── .env.example
+└── package.json
+```
 
-- [ ] Learn from accepted/rejected suggestions
-- [ ] Context-aware suggestions from the editor
-- [ ] Repository/project context
-- [ ] Automatic prompt quality scoring
-- [ ] Multi-model routing
-- [ ] Local-model support
+## Scope and Limitations
 
-## Design principle
+Commander currently exposes the suggestion API; the inline editor/autocomplete interface is a roadmap item, not part of the committed application. Live suggestions require an OpenAI API key and a model available to the account. Mock mode does not call any external provider. The response cache is in-memory and resets when the process restarts.
 
-**Commander should make prompting faster, not make prompting more complicated.**
+## License
 
-The system should do the hard work behind the editor while the user stays in control.
+MIT. See [LICENSE](LICENSE).
