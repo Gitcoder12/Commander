@@ -3,7 +3,7 @@ import { AGENTS, buildAgentPrompt } from "./agents.js";
 import { addNovelty, rankSuggestions } from "./ranker.js";
 
 const PORT = Number(process.env.PORT || 3000);
-const MODEL = process.env.COMMANDER_MODEL || "gpt-5.6-luna";
+const MODEL = process.env.COMMANDER_MODEL || "gpt-6-luna";
 const MAX_SUGGESTIONS = Math.min(Number(process.env.MAX_SUGGESTIONS || 5), AGENTS.length);
 const CACHE_TTL_MS = Number(process.env.CACHE_TTL_MS || 60000);
 const cache = new Map();
