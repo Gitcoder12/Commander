@@ -14,26 +14,30 @@ function similarity(a, b) {
 }
 
 export function rankSuggestions(suggestions, max = 5) {
-  const unique = [];
-  const seen = new Set();
+  const deduplicated = new Map();
 
   for (const item of suggestions) {
     const text = String(item.text || "").trim();
     const key = normalize(text);
-    if (!text || seen.has(key)) continue;
-    seen.add(key);
+    if (!text) continue;
 
     const raw = Number.isFinite(item.score) ? item.score : 0.6;
     const words = text.split(/\s+/).length;
     const lengthPenalty = words < 4 ? 0.08 : words > 100 ? 0.08 : 0;
     const finalScore = clamp(raw + (item.novelty ?? 0) - lengthPenalty);
+    const candidate = { ...item, text, score: Number(finalScore.toFixed(3)) };
+    const existing = deduplicated.get(key);
 
-    unique.push({ ...item, text, score: Number(finalScore.toFixed(3)) });
+    // Keep the strongest variant when two agents produce the same text.
+    if (!existing || candidate.score > existing.score) {
+      deduplicated.set(key, candidate);
+    }
   }
 
+  const unique = [...deduplicated.values()];
   unique.sort((a, b) => b.score - a.score);
 
-  // Prefer diversity so Commander does not return five near-identical completions.
+  // Prefer diversity so Commander does not return near-identical agent types.
   const selected = [];
   const usedTypes = new Set();
   for (const item of unique) {
