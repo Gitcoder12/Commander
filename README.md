@@ -123,3 +123,15 @@ MIT. See [LICENSE](LICENSE).
 - [Company and team fit](COMPANY_FIT.md) · [README explanation draft](README_ADDENDUM_DRAFT.md)
 - [README quality checklist](README_QUALITY_CHECKLIST.md)
 - [Contributing](CONTRIBUTING.md) · [Agent instructions](AGENTS.md) · [Agent skills](SKILLS.md)
+
+## Understanding the project
+
+### In plain language
+
+A Node.js API that takes an incomplete prompt and asks several specialist agents to produce clearer, more useful alternatives.
+
+### Technical and research view
+
+A user submits a partial prompt. Several specialist agents propose different improvements. The service removes near-duplicates, ranks suggestions and returns structured alternatives. In mock mode, it returns deterministic examples without making paid model calls.
+
+For future work, see [FEATURE_UPGRADE_PLAN.md](FEATURE_UPGRADE_PLAN.md), [ACTIVITY_LOG.md](ACTIVITY_LOG.md), [COMPANY_FIT.md](COMPANY_FIT.md) and [CONTRIBUTING.md](CONTRIBUTING.md).
