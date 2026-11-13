@@ -17,3 +17,12 @@ Node.js service using the OpenAI Responses API with seven specialist prompt agen
 | YYYY-MM-DD | name | link | model/provider, agents | exact command and concurrency | pass / fail / not run | test result and cost caveat |
 
 Record security, request/cost behavior and failed checks. Never commit API keys or include raw prompts in logs without a reviewed retention policy.
+
+## Portfolio documentation rollout — 2026-11-13
+
+- Documentation PR: https://github.com/Gitcoder12/Commander/pull/5
+- Added project-specific feature plan, company-fit mapping, two-level README guide and quality checklist.
+- Existing contributor/agent instructions were preserved where present; any new agent guidance is scoped to this project's workflow and tests.
+- README now contains a plain-language overview and a technical/research view while retaining existing setup instructions.
+- Validation: documentation/source review only; no runtime test or deployment is claimed by this docs PR.
+- Status: draft PR, not merged.
