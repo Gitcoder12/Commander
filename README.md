@@ -1,37 +1,37 @@
-# Commander
+# Commander ⚡
 
-**A lightweight Node.js service that turns partial prompts into ranked, diverse suggestions.**
+Commander is an AI-powered prompt copilot that turns partial prompts into useful, ready-to-use suggestions.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+It is designed for an **inline/autocomplete UX**, not a normal chatbot. Instead of asking one model to finish text, Commander orchestrates several focused agents that can **finish, expand, clarify, critique, format, split, and strengthen** a prompt.
 
-Commander is a prompt-improvement API, not a chat interface. It runs a set of focused agents in parallel to complete, expand, clarify, critique, format, or break a partial prompt into steps.
+## Core idea
 
-## Current Features
-
-- Seven specialist prompt agents.
-- Parallel calls through the OpenAI Responses API.
-- JSON-structured agent outputs.
-- Deduplication, novelty scoring, and type-aware ranking.
-- Short-lived in-memory response cache.
-- Mock mode when `OPENAI_API_KEY` is not configured.
-
-## Quick Start
-
-Node.js 20 or later is required.
-
-```bash
-git clone https://github.com/Gitcoder12/Commander.git
-cd Commander
-cp .env.example .env
+```text
+User types a partial prompt
+        ↓
+   Commander API
+        ↓
+ ┌──────┼──────────────────────────┐
+ ↓      ↓       ↓       ↓          ↓
+Finish Expand Clarify Critic   Formatter...
+ └──────┴──────────────────────────┘
+        ↓
+ Deduplicate + score + diversify
+        ↓
+  Top suggestions → editor
 ```
 
-Edit `.env` and add an API key to enable live model requests. Without a key, Commander returns deterministic mock suggestions.
+## Agent roles
 
-```bash
-npm start
-```
-
-The API listens on `http://localhost:3000`.
+| Agent | Purpose |
+|---|---|
+| `finisher` | Completes the prompt without changing its intent |
+| `expander` | Adds useful context, constraints, and expected output |
+| `clarifier` | Finds the most valuable missing constraint |
+| `critic` | Finds ambiguity or a weak assumption |
+| `formatter` | Suggests a useful output structure |
+| `stepper` | Converts a task into 3–5 actionable steps |
+| `persona` | Adds an expert role when it materially helps |
 
 ## API
 
@@ -42,12 +42,13 @@ Request:
 ```json
 {
   "promptPartial": "build me a website for",
+  "cursorIndex": 27,
   "context": "The user is building a portfolio site",
   "max_suggestions": 5
 }
 ```
 
-Response shape:
+Response:
 
 ```json
 {
@@ -60,12 +61,47 @@ Response shape:
       "agent": "finisher"
     }
   ],
-  "model": "gpt-6-luna",
+  "model": "gpt-5.6-luna",
   "cached": false
 }
 ```
 
-Try it locally:
+## UX target
+
+Commander should eventually support:
+
+- **Ghost completion:** highest-confidence completion appears inline; `Tab` accepts it.
+- **Suggestion palette:** `↑ ↓ Enter` navigates 3–6 alternatives.
+- **Combine:** accept useful pieces from different agents.
+- **Preview:** inspect the complete prompt before inserting it.
+- **Keyboard-first:** the user should rarely need to leave the editor.
+
+## MVP architecture
+
+The current MVP is intentionally small:
+
+- Node.js HTTP server
+- Parallel specialist agents
+- OpenAI Responses API adapter
+- Strict JSON output from agents
+- Deduplication
+- Novelty scoring
+- Type diversity in the final ranking
+- Short-lived in-memory cache
+- Mock mode when `OPENAI_API_KEY` is not configured
+
+No frontend framework or dependency is required yet. This keeps the core orchestration easy to test and replace.
+
+## Run locally
+
+```bash
+cp .env.example .env
+npm start
+```
+
+Without an API key, Commander runs in mock mode.
+
+Test the endpoint:
 
 ```bash
 curl -X POST http://localhost:3000/api/suggest \
@@ -73,65 +109,59 @@ curl -X POST http://localhost:3000/api/suggest \
   -d '{"promptPartial":"build me a portfolio website","max_suggestions":5}'
 ```
 
-## Configuration
+## Roadmap
 
-| Variable | Purpose |
-|---|---|
-| `PORT` | HTTP server port (default: `3000`) |
-| `OPENAI_API_KEY` | Enables live model calls; omit to use mock mode |
-| `COMMANDER_MODEL` | OpenAI model ID (default: `gpt-6-luna`) |
-| `MAX_SUGGESTIONS` | Default maximum number of returned suggestions |
-| `CACHE_TTL_MS` | In-memory cache lifetime in milliseconds |
+### Phase 1 — Core engine
 
-Use a model ID available to your OpenAI API project and override `COMMANDER_MODEL` as needed.
+- [x] Agent definitions
+- [x] Parallel orchestration
+- [x] JSON parsing
+- [x] Ranking and deduplication
+- [x] Mock mode
+- [x] API endpoint
 
-## Run Tests
+### Phase 2 — Editor UX
 
-```bash
-npm test
-```
+- [ ] Inline ghost completion
+- [ ] Suggestion palette
+- [ ] Keyboard controls
+- [ ] Accept/replace/append actions
+- [ ] Combine suggestions
 
-The tests cover suggestion deduplication, score ordering, and type diversity.
+### Phase 3 — Production intelligence
 
-## Project Structure
+- [ ] Streaming suggestions
+- [ ] Better semantic similarity
+- [ ] User-specific preferences
+- [ ] Model routing by task complexity
+- [ ] Cost and latency telemetry
+- [ ] Persistent cache
+- [ ] Abuse/rate limiting
 
-```text
-Commander/
-├── src/
-│   ├── server.js  # HTTP endpoint and model orchestration
-│   ├── agents.js  # Specialist agent instructions
-│   └── ranker.js  # Deduplication, novelty, and ranking
-├── tests/
-│   └── ranker.test.js
-├── .env.example
-└── package.json
-```
+### Phase 4 — Commander becomes a prompt operating layer
 
-## Scope and Limitations
+- [ ] Learn from accepted/rejected suggestions
+- [ ] Context-aware suggestions from the editor
+- [ ] Repository/project context
+- [ ] Automatic prompt quality scoring
+- [ ] Multi-model routing
+- [ ] Local-model support
 
-Commander currently exposes the suggestion API; the inline editor/autocomplete interface is a roadmap item, not part of the committed application. Live suggestions require an OpenAI API key and a model available to the account. Mock mode does not call any external provider. The response cache is in-memory and resets when the process restarts.
+## Design principle
 
-## License
+**Commander should make prompting faster, not make prompting more complicated.**
 
-MIT. See [LICENSE](LICENSE).
+The system should do the hard work behind the editor while the user stays in control.
+
 
 ---
 
-## Project handbook
+## AI-maintained project notes (secondary — 2026-11-13)
 
-- [Activity log](ACTIVITY_LOG.md) · [Feature upgrade plan](FEATURE_UPGRADE_PLAN.md)
-- [Company and team fit](COMPANY_FIT.md) · [README explanation draft](README_ADDENDUM_DRAFT.md)
-- [README quality checklist](README_QUALITY_CHECKLIST.md)
-- [Contributing](CONTRIBUTING.md) · [Agent instructions](AGENTS.md) · [Agent skills](SKILLS.md)
+This section supplements the maintainer-authored README above. The original text has been restored verbatim from Git-history baseline `9650672c90a079f527bc2da7ab846631a1af94a8`; this addendum does not replace or certify the original claims.
 
-## Understanding the project
-
-### In plain language
-
-A Node.js API that takes an incomplete prompt and asks several specialist agents to produce clearer, more useful alternatives.
-
-### Technical and research view
-
-A user submits a partial prompt. Several specialist agents propose different improvements. The service removes near-duplicates, ranks suggestions and returns structured alternatives. In mock mode, it returns deterministic examples without making paid model calls.
-
-For future work, see [FEATURE_UPGRADE_PLAN.md](FEATURE_UPGRADE_PLAN.md), [ACTIVITY_LOG.md](ACTIVITY_LOG.md), [COMPANY_FIT.md](COMPANY_FIT.md) and [CONTRIBUTING.md](CONTRIBUTING.md).
+- The current source tree, runtime data and tests are the implementation source of truth. Roadmap items, draft PRs and AI-generated descriptions are not shipped features by themselves.
+- Preserve real and maintainer-provided data. Never silently substitute generated or placeholder data. Clearly label and isolate synthetic fixtures.
+- Mark unverified sources, identifiers, metrics, benchmark results and external claims as unknown/unverified rather than guessing.
+- Verify setup, execution, tests and public claims against the exact current commit before using this repository in a job, research or academic application.
+- See [MODEL_AUDIT_ROUTER.md](MODEL_AUDIT_ROUTER.md) for independent model review instructions and the merge gate.
