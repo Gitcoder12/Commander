@@ -165,3 +165,23 @@ This section supplements the maintainer-authored README above. The original text
 - Mark unverified sources, identifiers, metrics, benchmark results and external claims as unknown/unverified rather than guessing.
 - Verify setup, execution, tests and public claims against the exact current commit before using this repository in a job, research or academic application.
 - See [MODEL_AUDIT_ROUTER.md](MODEL_AUDIT_ROUTER.md) for independent model review instructions and the merge gate.
+
+---
+
+## Engineering Audit & Handover — 2026-11-17
+
+**Reviewed commit:** `e9f74b908f243c5e3611e0ec3df1761ac2e93c79` (`main`). Static inspection covered `src/server.js`, `src/ranker.js`, and `tests/ranker.test.js`; tests were not executed.
+
+### Confirmed findings
+- The HTTP response helper allows every origin via `access-control-allow-origin: *`. Restrict this before exposing an API that may use a paid model key.
+- `callModel()` has no explicit request timeout or abort signal, so a stalled upstream model request can hold the suggestion request open.
+- The model response is parsed as JSON, but the returned `text` and numeric `score` are not fully schema-validated or bounded before ranking.
+- The ranker tests cover duplicate removal, score ordering, and type diversity; they do not cover malformed model outputs, invalid scores, empty results, or upstream failures.
+- Without `OPENAI_API_KEY`, the server intentionally returns mock suggestions. These must not be mistaken for model-generated output.
+
+### Next actions
+1. Restrict CORS and add bounded request/model timeouts.
+2. Validate model output shape, text length, and score range; reject NaN/Infinity and malformed payloads.
+3. Add server integration tests for mock mode, provider errors, oversized/invalid requests, cache behavior, and partial agent failures.
+
+**Verification status:** static source/test inspection only; API startup, live provider integration, and tests remain unverified.
