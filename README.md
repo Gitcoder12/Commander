@@ -185,3 +185,23 @@ This section supplements the maintainer-authored README above. The original text
 3. Add server integration tests for mock mode, provider errors, oversized/invalid requests, cache behavior, and partial agent failures.
 
 **Verification status:** static source/test inspection only; API startup, live provider integration, and tests remain unverified.
+
+
+---
+
+## Branch Activity & Development History
+
+**Audit date:** 2026-11-18 · **Comparison base:** `main`
+
+| Branch | Difference from `main` | Observed work / changed paths |
+|---|---:|---|
+| `docs/portfolio-operating-kit-2026-11-13` | 5 ahead / 3 behind | Activity log, agent guidance, worklog, company-fit notes, contributor guide, feature plan, README support docs and skills; README has additions and removals |
+| `docs/project-status-2026-11-16-commander` | 1 / 1 | Project status snapshot: `PROJECT_STATUS.md` |
+| `docs/upgrade-plan` | 1 / 6 | Upgrade plan: `docs/UPGRADE_PLAN.md` |
+| `scaffold/mvp` | 1 / 6 | Initial safety module, server changes and API tests |
+
+### Open pull requests observed during this audit
+
+- [PR #6 — project status snapshot](https://github.com/Gitcoder12/Commander/pull/6)
+
+**Review note:** The portfolio branch includes README removals as well as additions. The MVP scaffold changes server behavior; inspect routes and run API tests before merging. No branches have been merged or deleted by this documentation update.
