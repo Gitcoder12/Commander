@@ -185,3 +185,10 @@ This section supplements the maintainer-authored README above. The original text
 3. Add server integration tests for mock mode, provider errors, oversized/invalid requests, cache behavior, and partial agent failures.
 
 **Verification status:** static source/test inspection only; API startup, live provider integration, and tests remain unverified.
+
+---
+
+## Examples Used
+- Completing a partial prompt without changing its intent
+- Expanding a vague request with missing constraints
+- Comparing specialist-agent suggestions before inserting one into an editor
