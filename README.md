@@ -192,3 +192,27 @@ This section supplements the maintainer-authored README above. The original text
 - Completing a partial prompt without changing its intent
 - Expanding a vague request with missing constraints
 - Comparing specialist-agent suggestions before inserting one into an editor
+
+
+---
+
+## Comparison with Existing Open-Source Projects
+
+Commander is documented as an inline prompt copilot that generates alternative completions, expansions, clarifications and critiques through specialist agents. The following projects cover adjacent prompt, agent and editor workflows.
+
+| Project | Established focus | Relationship to Commander |
+|---|---|---|
+| [Continue](https://github.com/continuedev/continue) | Open-source AI code-assistant and IDE integration | Provides mature in-editor AI assistance; Commander is narrower and focuses on improving the prompt being composed rather than acting as a general coding assistant. |
+| [Langfuse](https://github.com/langfuse/langfuse) | LLM observability, prompt management and evaluation | Stronger prompt lifecycle/observability platform; Commander aims at the moment-to-moment authoring UX with specialist suggestions. |
+| [Promptfoo](https://github.com/promptfoo/promptfoo) | Prompt testing, evaluation and red-teaming | Evaluates prompt/model behavior; Commander generates and ranks prompt alternatives before execution. |
+
+### Where Commander is different
+- **Inline/autocomplete interaction:** the design explicitly targets a partial prompt and cursor position, not a conventional chatbot conversation.
+- **Specialist suggestion roles:** finish, expand, clarify, critique and format are separate generation roles whose outputs are deduplicated and diversified.
+- **User-controlled assembly:** the intended UX lets users combine useful suggestions while remaining in the editor.
+
+### Where established projects are stronger
+Continue has a mature editor integration ecosystem; Langfuse and Promptfoo provide deeper prompt lifecycle and evaluation infrastructure. The Commander README describes a small API MVP, while its ghost completion and editor palette are roadmap items—not shipped capabilities.
+
+### Evidence and limitations
+Evaluate suggestion acceptance, intent preservation, semantic diversity, latency and cost on a reproducible prompt set. Avoid treating a novelty score as prompt quality without validation. Clearly distinguish mock mode from live provider output and document provider-specific failures. This is a workflow comparison, not a prompt-quality benchmark.
