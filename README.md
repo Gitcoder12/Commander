@@ -1,5 +1,16 @@
 # Commander ⚡
 
+
+## Current Status / Current Version
+
+**MVP — version not stated in README**
+
+**Implemented according to README:** Node.js API, specialist-agent orchestration, structured JSON parsing, ranking/deduplication, mock mode and `/api/suggest` endpoint.
+
+**Incomplete / roadmap:** inline ghost completion, suggestion palette, keyboard controls, combine/preview UX, streaming, semantic similarity improvements, persistent cache, rate limiting, telemetry and local-model support.
+
+**Verification still required:** live-provider behavior, latency, reliability and a complete editor experience need separate demonstration and test evidence.
+
 Commander is an AI-powered prompt copilot that turns partial prompts into useful, ready-to-use suggestions.
 
 It is designed for an **inline/autocomplete UX**, not a normal chatbot. Instead of asking one model to finish text, Commander orchestrates several focused agents that can **finish, expand, clarify, critique, format, split, and strengthen** a prompt.
